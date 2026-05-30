@@ -229,23 +229,32 @@
   }
 
   async function nextCard() {
-    if(words.length === 0) return;
-    const stage = document.getElementById('cardStage');
-    stage.classList.add('slide-animation');
-
-    // 向后端递增数据
-    const res = await fetch('/api/count/add', { method: 'POST' });
-    const data = await res.json();
-    document.getElementById('todayCount').innerText = data.todayCount;
-    document.getElementById('adminTodayCount').innerText = data.todayCount;
-
-    setTimeout(() => {
-      currentIndex = (currentIndex + 1) % words.length;
-      renderCard();
-    }, 220);
-
-    setTimeout(() => { stage.classList.remove('slide-animation'); }, 450);
+  if(words.length === 0) return;
+  
+  // 1. ⚡ 核心修复：不管卡片现在是哪一面，在切卡的瞬间，立刻脱掉翻转类名，强制让它回到正面！
+  // 💡 注意：请把下面这行的 'card' 换成你 HTML 里整张卡片最外层的那个 ID（比如 'card' 或 'flashcard'）
+  const cardElement = document.getElementById('card'); 
+  if (cardElement) {
+    cardElement.classList.remove('flipped'); // 或者是你用来控制翻转的类名，比如 'is-flipped'
   }
+
+  const stage = document.getElementById('cardStage');
+  stage.classList.add('slide-animation');
+
+  // 向后端递增数据
+  const res = await fetch('/api/count/add', { method: 'POST' });
+  const data = await res.json();
+  document.getElementById('todayCount').innerText = data.todayCount;
+  document.getElementById('adminTodayCount').innerText = data.todayCount;
+
+  // 2. 220毫秒时卡片正在滑出屏幕，这时候悄悄把里面的字换掉，保证神不知鬼不觉
+  setTimeout(() => {
+    currentIndex = (currentIndex + 1) % words.length;
+    renderCard();
+  }, 220);
+
+  setTimeout(() => { stage.classList.remove('slide-animation'); }, 450);
+}
 
   // 【功能1】家长一键清空统计数据
   async function clearDailyCount() {
