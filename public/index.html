@@ -231,36 +231,34 @@
   async function nextCard() {
   if(words.length === 0) return;
 
-  // 1. 抓到整张卡片和背面的中文元素
-  // 💡 【注意】：请把 'card' 和 'word-back' 换成你 HTML 里实际的卡片 ID 和中文容器 ID
-  const cardElement = document.getElementById('card'); 
-  const chineseView = document.getElementById('word-back'); 
-
-  // 2. 🔥 【物理隐形】：在切卡的一瞬间，直接把中文的外观设为透明/隐藏
-  // 这样不论卡片怎么晃、怎么翻，背面都是一片空白
-  if (chineseView) chineseView.style.opacity = '0';
-  if (cardElement) cardElement.classList.remove('flipped'); 
-
+  // 1. ⚡ 抓取卡片舞台大盒子
   const stage = document.getElementById('cardStage');
+
+  // 2. 🔥【核心修复：第 0 毫秒强行翻回正面】
+  // 不管学生现在看的是中文还是英文，按下按钮的瞬间，立刻剥离翻转类名，强制它转回正面
+  if (stage) stage.classList.remove('is-flipped');
+  isFlipped = false; // 必须把全局的翻转状态同步重置为“未翻转”
+
+  // 3. 开启滑出滑进的滑屏动画
   stage.classList.add('slide-animation');
 
-  // 向后端递增数据
+  // 向后端递增今日已背数据（网络请求在后台默默走，不影响下面的卡片切换）
   const res = await fetch('/api/count/add', { method: 'POST' });
   const data = await res.json();
   document.getElementById('todayCount').innerText = data.todayCount;
   document.getElementById('adminTodayCount').innerText = data.todayCount;
 
-  // 3. 在卡片滑到一半时，悄悄换上新词的字
+  // 4. ⌛【精准对齐换字时间】
+  // 220毫秒时，卡片刚刚滑到最左边（屏幕外），此时它已经是正面朝上了。
+  // 我们在这个盲区里精准把旧词换成新词。
   setTimeout(() => {
     currentIndex = (currentIndex + 1) % words.length;
-    renderCard();
+    renderCard(); // renderCard 内部也会确保 stage 没有 'is-flipped'
   }, 220);
 
-  // 4. 🔥 【重新通电】：450毫秒后，整个滑出滑进的动画彻底结束了
-  // 卡片已经安稳地以“英文正面”停在屏幕中央，这时我们悄悄恢复中文的可见性
+  // 450毫秒后，新卡片完美回到屏幕中央，动画结束，脱掉动画类名
   setTimeout(() => { 
     stage.classList.remove('slide-animation'); 
-    if (chineseView) chineseView.style.opacity = '1'; // 恢复可见，此时它安分地呆在背面
   }, 450);
 }
 
