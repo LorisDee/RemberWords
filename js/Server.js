@@ -6,16 +6,17 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 9898; // 适配云服务器端口
 
+
 // =================【永久化 & 配置区域】=================
 const ADMIN_USERNAME = "admin"; 
 const ADMIN_PASSWORD = "password123"; 
 
-// 💡 填入你第一步在 GitHub 申请的信息
-const GITHUB_TOKEN = "你的_GITHUB_TOKEN"; 
-const GITHUB_REPO = "LorisDee/rember-data"; 
+// 💡 这样写，Node 就会自动去 Render 的“秘密小账本”里抓取你刚刚填的 Token
+const GITHUB_TOKEN = process.env.MY_GITHUB_TOKEN; 
+
+const GITHUB_REPO = "你的GitHub用户名/rember-data"; // 你的数据仓库名
 const FILE_PATH = "dictionary.json"; 
 // ====================================================
-
 app.use(express.json());
 app.use(fileUpload());
 app.use(express.static(path.join(__dirname, '../public')));
