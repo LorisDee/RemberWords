@@ -12,7 +12,7 @@ const ADMIN_PASSWORD = "password123";
 
 // 💡 填入你第一步在 GitHub 申请的信息
 const GITHUB_TOKEN = "你的_GITHUB_TOKEN"; 
-const GITHUB_REPO = "你的GitHub用户名/rember-data"; 
+const GITHUB_REPO = "LorisDee/rember-data"; 
 const FILE_PATH = "dictionary.json"; 
 // ====================================================
 
