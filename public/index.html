@@ -230,13 +230,16 @@
 
   async function nextCard() {
   if(words.length === 0) return;
-  
-  // 1. ⚡ 核心修复：不管卡片现在是哪一面，在切卡的瞬间，立刻脱掉翻转类名，强制让它回到正面！
-  // 💡 注意：请把下面这行的 'card' 换成你 HTML 里整张卡片最外层的那个 ID（比如 'card' 或 'flashcard'）
+
+  // 1. 抓到整张卡片和背面的中文元素
+  // 💡 【注意】：请把 'card' 和 'word-back' 换成你 HTML 里实际的卡片 ID 和中文容器 ID
   const cardElement = document.getElementById('card'); 
-  if (cardElement) {
-    cardElement.classList.remove('flipped'); // 或者是你用来控制翻转的类名，比如 'is-flipped'
-  }
+  const chineseView = document.getElementById('word-back'); 
+
+  // 2. 🔥 【物理隐形】：在切卡的一瞬间，直接把中文的外观设为透明/隐藏
+  // 这样不论卡片怎么晃、怎么翻，背面都是一片空白
+  if (chineseView) chineseView.style.opacity = '0';
+  if (cardElement) cardElement.classList.remove('flipped'); 
 
   const stage = document.getElementById('cardStage');
   stage.classList.add('slide-animation');
@@ -247,13 +250,18 @@
   document.getElementById('todayCount').innerText = data.todayCount;
   document.getElementById('adminTodayCount').innerText = data.todayCount;
 
-  // 2. 220毫秒时卡片正在滑出屏幕，这时候悄悄把里面的字换掉，保证神不知鬼不觉
+  // 3. 在卡片滑到一半时，悄悄换上新词的字
   setTimeout(() => {
     currentIndex = (currentIndex + 1) % words.length;
     renderCard();
   }, 220);
 
-  setTimeout(() => { stage.classList.remove('slide-animation'); }, 450);
+  // 4. 🔥 【重新通电】：450毫秒后，整个滑出滑进的动画彻底结束了
+  // 卡片已经安稳地以“英文正面”停在屏幕中央，这时我们悄悄恢复中文的可见性
+  setTimeout(() => { 
+    stage.classList.remove('slide-animation'); 
+    if (chineseView) chineseView.style.opacity = '1'; // 恢复可见，此时它安分地呆在背面
+  }, 450);
 }
 
   // 【功能1】家长一键清空统计数据
