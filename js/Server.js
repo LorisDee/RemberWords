@@ -14,7 +14,7 @@ const ADMIN_PASSWORD = "password123";
 // 💡 这样写，Node 就会自动去 Render 的“秘密小账本”里抓取你刚刚填的 Token
 const GITHUB_TOKEN = process.env.MY_GITHUB_TOKEN; 
 
-const GITHUB_REPO = "你的GitHub用户名/rember-data"; // 你的数据仓库名
+const GITHUB_REPO = "LorisDee/rember-data"; // 你的数据仓库名
 const FILE_PATH = "dictionary.json"; 
 // ====================================================
 app.use(express.json());
